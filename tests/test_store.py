@@ -57,6 +57,16 @@ def test_start_delivery(make_sample_book):
     assert store.get_delivery_status(cart.get_id()) == schemas.Status.finished
 
 
+def test_restart_delivery_fails():
+    store = BookStore()
+
+    cart = Cart()
+    store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
+
+    with pytest.raises(RuntimeError):
+        store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
+
+
 def test_deliver_nonexistent():
     store = BookStore()
 
@@ -100,6 +110,19 @@ def test_refund_works(make_sample_book, refund: schemas.RefundRequest):
     store.set_refund_status(cart.get_id(), schemas.Status.waiting)
 
     assert store.get_refund_status(cart.get_id()) == schemas.Status.waiting
+
+
+def test_restart_refund_fails():
+    store = BookStore()
+
+    cart = Cart()
+    store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
+    store.set_delivery_status(cart.get_id(), schemas.Status.finished)
+
+    store.start_refund(cart.get_id(), schemas.RefundRequest())
+
+    with pytest.raises(RuntimeError):
+        store.start_refund(cart.get_id(), schemas.RefundRequest())
 
 
 def test_refund_nonexistent():
