@@ -136,3 +136,22 @@ def test_refund_nonexistent():
 
     with pytest.raises(KeyError):
         store.set_refund_status('12321', schemas.Status.finished)
+
+
+@pytest.mark.parametrize(
+    'cur_status,refund',
+    [
+        (schemas.Status.created, schemas.RefundRequest(address='123')),
+        (schemas.Status.waiting, schemas.RefundRequest(address='123')),
+        (schemas.Status.finished, schemas.RefundRequest()),
+    ]
+)
+def test_refund_delivery_status_mismatch(cur_status: schemas.Status, refund: schemas.RefundRequest):
+    store = BookStore()
+
+    cart = Cart()
+    store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
+    store.set_delivery_status(cart.get_id(), cur_status)
+
+    with pytest.raises(RuntimeError):
+        store.start_refund(cart.get_id(), refund)
