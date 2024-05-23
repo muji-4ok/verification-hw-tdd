@@ -24,6 +24,8 @@ class Cart:
 class BookStore:
     def __init__(self):
         self._book_catalog = dict()
+        self._carts = dict()
+        self._delivery_statuses = dict()
 
     def add_book(self, book: schemas.Book):
         self._book_catalog[book.name] = book
@@ -31,14 +33,21 @@ class BookStore:
     def get_book(self, name: str) -> schemas.Book:
         return self._book_catalog[name]
 
-    def start_delivery(self, cart: Cart, request: schemas.DeliveryRequest):
-        pass
+    def start_delivery(self, cart: Cart, _: schemas.DeliveryRequest):
+        for name in cart.get_books():
+            # Check for existence, might raise
+            self._book_catalog[name]
+
+        self._delivery_statuses[cart.get_id()] = schemas.Status.created
 
     def get_delivery_status(self, cart_id: str) -> schemas.Status:
-        pass
+        return self._delivery_statuses[cart_id]
 
     def set_delivery_status(self, cart_id: str, status: schemas.Status):
-        pass
+        # Check for existence, might raise
+        self._delivery_statuses[cart_id]
+
+        self._delivery_statuses[cart_id] = status
 
     def start_refund(self, cart_id: str, request: schemas.RefundRequest):
         pass
