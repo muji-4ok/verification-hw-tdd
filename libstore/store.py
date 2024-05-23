@@ -1,21 +1,24 @@
+import uuid
+
 from libstore import schemas
 
 
 class Cart:
     def __init__(self):
-        pass
+        self._id = str(uuid.uuid4())
+        self._books = set()
 
     def get_id(self) -> str:
-        pass
+        return self._id
 
     def add_book(self, book_name: str):
-        pass
+        self._books.add(book_name)
 
     def remove_book(self, book_name: str):
-        pass
+        self._books.remove(book_name)
 
     def get_books(self) -> set[str]:
-        pass
+        return self._books
 
 
 class BookStore:

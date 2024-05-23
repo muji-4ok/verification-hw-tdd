@@ -24,7 +24,7 @@ def test_add_to_cart_multiple():
 def test_remove_cart_nonexistent():
     cart = Cart()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         cart.remove_book('123')
 
 
