@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+from pydantic import ValidationError
 
 from libstore import schemas
 from libstore.store import BookStore, Cart
@@ -51,6 +52,10 @@ def test_start_delivery(make_sample_book):
 
     assert store.get_delivery_status(cart.get_id()) == schemas.Status.created
 
+    store.set_delivery_status(cart.get_id(), schemas.Status.finished)
+
+    assert store.get_delivery_status(cart.get_id()) == schemas.Status.finished
+
 
 def test_deliver_nonexistent():
     store = BookStore()
@@ -76,7 +81,14 @@ def test_nonexistent_set_delivery_status():
         store.set_delivery_status('1231231', schemas.Status.waiting)
 
 
-def test_update_delivery_status(make_sample_book):
+def test_invalid_refund_request():
+    request = schemas.RefundRequest(was_delivered=False, address='123')
+
+    with pytest.raises(ValidationError):
+        request.model_validate()
+
+
+def test_refund_works():
     book = make_sample_book('123')
 
     store = BookStore()
@@ -87,4 +99,23 @@ def test_update_delivery_status(make_sample_book):
     store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
     store.set_delivery_status(cart.get_id(), schemas.Status.finished)
 
-    assert store.get_delivery_status(cart.get_id()) == schemas.Status.finished
+    store.start_refund(cart.get_id(), schemas.RefundRequest(was_delivered=False))
+
+    assert store.get_refund_status(cart.get_id()) == schemas.Status.created
+
+    store.set_refund_status(cart.get_id(), schemas.Status.waiting)
+
+    assert store.get_refund_status(cart.get_id()) == schemas.Status.waiting
+
+
+def test_refund_nonexistent():
+    store = BookStore()
+
+    with pytest.raises(KeyError):
+        store.start_refund('12321', schemas.RefundRequest(was_delivered=False))
+
+    with pytest.raises(KeyError):
+        store.get_refund_status('12321')
+
+    with pytest.raises(KeyError):
+        store.set_refund_status('12321', schemas.Status.finished)

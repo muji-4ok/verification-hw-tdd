@@ -27,4 +27,4 @@ class DeliveryRequest(BaseModel):
 
 class RefundRequest(BaseModel):
     was_delivered: bool
-    courier_delivery: DeliveryRequest | None
+    address: str | None
