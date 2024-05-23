@@ -23,13 +23,13 @@ class Cart:
 
 class BookStore:
     def __init__(self):
-        pass
+        self._book_catalog = dict()
 
     def add_book(self, book: schemas.Book):
-        pass
+        self._book_catalog[book.name] = book
 
     def get_book(self, name: str) -> schemas.Book:
-        pass
+        return self._book_catalog[name]
 
     def start_delivery(self, cart: Cart, request: schemas.DeliveryRequest):
         pass
