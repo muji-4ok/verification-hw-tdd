@@ -91,8 +91,14 @@ def test_nonexistent_set_delivery_status():
         store.set_delivery_status('1231231', schemas.Status.waiting)
 
 
-@pytest.mark.parametrize('refund', [schemas.RefundRequest(), schemas.RefundRequest(address='123')])
-def test_refund_works(make_sample_book, refund: schemas.RefundRequest):
+@pytest.mark.parametrize(
+    'cur_status,refund',
+    [
+        (schemas.Status.waiting, schemas.RefundRequest()),
+        (schemas.Status.finished, schemas.RefundRequest(address='123'))
+    ]
+)
+def test_refund_works(make_sample_book, cur_status: schemas.Status, refund: schemas.RefundRequest):
     book = make_sample_book('123')
 
     store = BookStore()
@@ -101,7 +107,7 @@ def test_refund_works(make_sample_book, refund: schemas.RefundRequest):
     cart = Cart()
     cart.add_book('123')
     store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
-    store.set_delivery_status(cart.get_id(), schemas.Status.finished)
+    store.set_delivery_status(cart.get_id(), cur_status)
 
     store.start_refund(cart.get_id(), refund)
 
@@ -119,7 +125,7 @@ def test_restart_refund_fails():
     store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
     store.set_delivery_status(cart.get_id(), schemas.Status.finished)
 
-    store.start_refund(cart.get_id(), schemas.RefundRequest())
+    store.start_refund(cart.get_id(), schemas.RefundRequest(address='123'))
 
     with pytest.raises(RuntimeError):
         store.start_refund(cart.get_id(), schemas.RefundRequest())

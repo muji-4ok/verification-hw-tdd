@@ -59,6 +59,9 @@ class BookStore:
         if cart_id in self._refund_statuses:
             raise RuntimeError('Cannot restart a refund')
 
+        if (request.address is None) ^ (self._delivery_statuses[cart_id] != schemas.Status.finished):
+            raise RuntimeError('Delivery status mismatch with refund request')
+
         self._refund_statuses[cart_id] = schemas.Status.created
 
     def get_refund_status(self, cart_id: str) -> schemas.Status:
