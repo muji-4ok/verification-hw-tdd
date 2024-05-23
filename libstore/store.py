@@ -24,7 +24,6 @@ class Cart:
 class BookStore:
     def __init__(self):
         self._book_catalog = dict()
-        self._carts = dict()
         self._delivery_statuses = dict()
         self._refund_statuses = dict()
 
@@ -35,6 +34,9 @@ class BookStore:
         return self._book_catalog[name]
 
     def start_delivery(self, cart: Cart, _: schemas.DeliveryRequest):
+        if cart.get_id() in self._delivery_statuses:
+            raise RuntimeError('Cannot restart the delivery of the same cart')
+
         for name in cart.get_books():
             # Check for existence, might raise
             self._book_catalog[name]
@@ -53,6 +55,9 @@ class BookStore:
     def start_refund(self, cart_id: str, request: schemas.RefundRequest):
         # Check for existence, might raise
         self._delivery_statuses[cart_id]
+
+        if cart_id in self._refund_statuses:
+            raise RuntimeError('Cannot restart a refund')
 
         self._refund_statuses[cart_id] = schemas.Status.created
 
