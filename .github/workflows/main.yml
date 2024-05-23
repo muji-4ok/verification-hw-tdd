@@ -1,0 +1,33 @@
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run tests and generate report
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Run test
+        run: cd docker && docker compose run --rm test
+      - name: Collect coverage and profiling
+        uses: actions/upload-artifact@v4
+        with:
+          name: cov-prof
+          path: |
+            ./cov
+            ./prof
+  mypy:
+    runs-on: ubuntu-latest
+    name: Run mypy and collect report
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Run mypy
+        run: cd docker && docker compose run --rm test-mypy
+      - name: Collect mypy output
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mypy
+          path: |
+            ./mypy

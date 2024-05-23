@@ -1,0 +1,23 @@
+name: bookstore
+
+services:
+  test:
+    container_name: bookstore-test
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.app
+      target: bookstore-app-test
+    volumes:
+      - type: bind
+        source: ..
+        target: /app
+  test-mypy:
+    container_name: bookstore-test-mypy
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.app
+      target: bookstore-app-test-mypy
+    volumes:
+      - type: bind
+        source: ..
+        target: /app
