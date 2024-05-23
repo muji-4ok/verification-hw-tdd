@@ -20,7 +20,7 @@ class Status(StrEnum):
 
 
 class DeliveryRequest(BaseModel):
-    pay_first: bool
+    pay_first: bool = True
     address: str
     time: datetime
 
