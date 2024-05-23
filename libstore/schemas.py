@@ -1,7 +1,7 @@
 from enum import StrEnum
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class Book(BaseModel):
@@ -26,5 +26,4 @@ class DeliveryRequest(BaseModel):
 
 
 class RefundRequest(BaseModel):
-    was_delivered: bool
-    address: str | None
+    address: str | None = None

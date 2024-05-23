@@ -26,6 +26,7 @@ class BookStore:
         self._book_catalog = dict()
         self._carts = dict()
         self._delivery_statuses = dict()
+        self._refund_statuses = dict()
 
     def add_book(self, book: schemas.Book):
         self._book_catalog[book.name] = book
@@ -50,10 +51,16 @@ class BookStore:
         self._delivery_statuses[cart_id] = status
 
     def start_refund(self, cart_id: str, request: schemas.RefundRequest):
-        pass
+        # Check for existence, might raise
+        self._delivery_statuses[cart_id]
+
+        self._refund_statuses[cart_id] = schemas.Status.created
 
     def get_refund_status(self, cart_id: str) -> schemas.Status:
-        pass
+        return self._refund_statuses[cart_id]
 
     def set_refund_status(self, cart_id: str, status: schemas.Status):
-        pass
+        # Check for existence, might raise
+        self._refund_statuses[cart_id]
+
+        self._refund_statuses[cart_id] = status

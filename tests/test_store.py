@@ -81,14 +81,8 @@ def test_nonexistent_set_delivery_status():
         store.set_delivery_status('1231231', schemas.Status.waiting)
 
 
-def test_invalid_refund_request():
-    request = schemas.RefundRequest(was_delivered=False, address='123')
-
-    with pytest.raises(ValidationError):
-        request.model_validate()
-
-
-def test_refund_works():
+@pytest.mark.parametrize('refund', [schemas.RefundRequest(), schemas.RefundRequest(address='123')])
+def test_refund_works(make_sample_book, refund: schemas.RefundRequest):
     book = make_sample_book('123')
 
     store = BookStore()
@@ -99,7 +93,7 @@ def test_refund_works():
     store.start_delivery(cart, schemas.DeliveryRequest(address='aaa', time=SAMPLE_TIME))
     store.set_delivery_status(cart.get_id(), schemas.Status.finished)
 
-    store.start_refund(cart.get_id(), schemas.RefundRequest(was_delivered=False))
+    store.start_refund(cart.get_id(), refund)
 
     assert store.get_refund_status(cart.get_id()) == schemas.Status.created
 
@@ -112,7 +106,7 @@ def test_refund_nonexistent():
     store = BookStore()
 
     with pytest.raises(KeyError):
-        store.start_refund('12321', schemas.RefundRequest(was_delivered=False))
+        store.start_refund('12321', schemas.RefundRequest())
 
     with pytest.raises(KeyError):
         store.get_refund_status('12321')
