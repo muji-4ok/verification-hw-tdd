@@ -14,6 +14,9 @@ class Cart:
     def remove_book(self, book_name: str):
         pass
 
+    def get_books(self) -> set[str]:
+        pass
+
 
 class BookStore:
     def __init__(self):
